@@ -3,12 +3,12 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 const createProxy = createProxyMiddleware({
   //target: process.env.REACT_APP_PROXY_API || "https://uat.digit.org",
   // target: process.env.REACT_APP_PROXY_API || "https://qa.digit.org",
-  target: process.env.REACT_APP_PROXY_API || "http://digit.beehyv.com:9080",
+  target: process.env.REACT_APP_PROXY_API || "https://dfsdev.beehyv.com",
   changeOrigin: true,
   secure: false,
 });
 const assetsProxy = createProxyMiddleware({
-  target: process.env.REACT_APP_PROXY_ASSETS || "http://digit.beehyv.com:9080",
+  target: process.env.REACT_APP_PROXY_ASSETS || "https://dfsdev.beehyv.com",
   changeOrigin: true,
   secure: false,
 });
@@ -71,6 +71,14 @@ module.exports = function (app) {
     "/egov-pdf/download/WORKSESTIMATE/estimatepdf",
     "/muster-roll",
     "/individual",
-  ].forEach((location) => app.use(location, createProxy));
+  ].forEach((location) => {
+    if (location === "/dashboard-analytics") {
+      console.debug("called dashboard analytics, cheers!");
+      return app.use(location, createProxyMiddleware({ target: "http://localhost:8280/" }));
+    }
+    return app.use(location, createProxy);
+  });
   ["/pb-egov-assets"].forEach((location) => app.use(location, assetsProxy));
 };
+
+// .forEach((location) => app.use(location, createProxy));

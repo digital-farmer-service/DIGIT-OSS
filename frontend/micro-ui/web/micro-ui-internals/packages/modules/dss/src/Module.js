@@ -63,7 +63,7 @@ const Routes = ({ path, stateCode }) => {
     <div className="chart-wrapper" style={isMobile ? { marginTop: "unset" } : {}}>
       <DssBreadCrumb location={location} />
       <Switch>
-        <PrivateRoute path={`${path}/landing/home`} component={() => <Home stateCode={stateCode} />} />
+        {/* <PrivateRoute path={`${path}/landing/home`} component={() => <Home stateCode={stateCode} />} /> */}
         <PrivateRoute path={`${path}/dashboard/dfsdashboard`} component={() => <DashBoard stateCode={stateCode} />} />
         <PrivateRoute path={`${path}/drilldown`} component={() => <DrillDown stateCode={stateCode} />} />
         <Route key={"national-faq"} path={`${path}/national-faqs`}>

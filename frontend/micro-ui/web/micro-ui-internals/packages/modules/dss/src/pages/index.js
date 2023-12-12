@@ -50,7 +50,7 @@ const DashBoard = ({ stateCode }) => {
       filters: {
         tenantId,
       },
-      moduleLevel: moduleLevel
+      moduleLevel: moduleLevel,
     };
   });
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -64,8 +64,8 @@ const DashBoard = ({ stateCode }) => {
     select: (data) => {
       let screenConfig = data?.["dss-dashboard"]["dashboard-config"][0].MODULE_LEVEL;
       let reduced_array = [];
-      for(let i = 0 ; i < screenConfig.length ; i++){
-        if(screenConfig[i].dashboard !== null ){
+      for (let i = 0; i < screenConfig.length; i++) {
+        if (screenConfig[i].dashboard !== null) {
           reduced_array.push(screenConfig[i]);
         }
       }
@@ -73,11 +73,11 @@ const DashBoard = ({ stateCode }) => {
       const serviceJS = reduced_array.map((obj, idx) => {
         return {
           code: obj[Object.keys(obj)[0]].filterKey,
-          name: Digit.Utils.locale.getTransformedLocale(`DSS_${obj[Object.keys(obj)[0]].services_name}`)
-        }
-      }) ;
-      return serviceJS
-    }
+          name: Digit.Utils.locale.getTransformedLocale(`DSS_${obj[Object.keys(obj)[0]].services_name}`),
+        };
+      });
+      return serviceJS;
+    },
   });
   const { data: nationalInfo, isLoadingNAT } = Digit.Hooks.dss.useMDMS(stateCode, "tenant", ["nationalInfo"], {
     select: (data) => {
@@ -101,7 +101,7 @@ const DashBoard = ({ stateCode }) => {
     enabled: isNational,
   });
 
-  const { data: response, isLoading } = Digit.Hooks.dss.useDashboardConfig(moduleCode);
+  const { data: response, isLoading } = Digit.Hooks.dss.useDashboardConfig("farmersRegistered");
   const { data: ulbTenants, isLoading: isUlbLoading } = Digit.Hooks.useModuleTenants("DSS");
   const { isLoading: isMdmsLoading, data: mdmsData } = Digit.Hooks.useCommonMDMS(stateCode, "FSM", "FSTPPlantInfo");
   const [showOptions, setShowOptions] = useState(false);
@@ -152,9 +152,9 @@ const DashBoard = ({ stateCode }) => {
   const removeService = () => {
     handleFilters({
       ...filters,
-      moduleLevel: "" ,
+      moduleLevel: "",
     });
-  }
+  };
 
   const removeTenant = (id) => {
     handleFilters({
@@ -175,7 +175,7 @@ const DashBoard = ({ stateCode }) => {
   };
   const clearAllServices = () => {
     handleFilters({ ...filters, moduleLevel: "" });
-  }
+  };
 
   const dashboardConfig = response?.responseData;
   let tabArrayObj =
@@ -310,7 +310,7 @@ const DashBoard = ({ stateCode }) => {
             isOpen={isFilterModalOpen}
             closeFilters={() => setIsFilterModalOpen(false)}
             isNational={isNational}
-            showDateRange= {dashboardConfig?.[0]?.name.includes("DSS_FINANCE_DASHBOARD") ? false : true}
+            showDateRange={dashboardConfig?.[0]?.name.includes("DSS_FINANCE_DASHBOARD") ? false : true}
           />
         )}
         {filters?.filters?.tenantId?.length > 0 && (
@@ -425,9 +425,13 @@ const DashBoard = ({ stateCode }) => {
         )}
         {filters?.moduleLevel?.length > 0 && (
           <div className="tag-container">
-            {!showFilters &&
-              filters?.moduleLevel &&
-              (<RemoveableTag key={filters?.moduleLevel} text={`${t(`DSS_HEADER_SERVICE`)}: ${t(filters?.moduleLevel)}`} onClick={() => removeService()} />)}
+            {!showFilters && filters?.moduleLevel && (
+              <RemoveableTag
+                key={filters?.moduleLevel}
+                text={`${t(`DSS_HEADER_SERVICE`)}: ${t(filters?.moduleLevel)}`}
+                onClick={() => removeService()}
+              />
+            )}
             <p className="clearText cursorPointer" onClick={clearAllServices}>
               {t(`DSS_FILTER_CLEAR`)}
             </p>
@@ -458,7 +462,7 @@ const DashBoard = ({ stateCode }) => {
           </div>
         ) : null}
         <div>
-          {tabArray && tabArray?.length > 1 && (
+          {/* {tabArray && tabArray?.length > 1 && (
             <div className="dss-switch-tabs chart-row">
               <div className="dss-switch-tab-wrapper">
                 {tabArray?.map((key) => (
@@ -468,13 +472,11 @@ const DashBoard = ({ stateCode }) => {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </div>
-        {dashboardConfig?.[0]?.visualizations
-          .filter((row) => row.name === tabState)
-          .map((row, key) => {
-            return <Layout rowData={row} key={key} />;
-          })}
+        {dashboardConfig?.[0]?.visualizations.map((row, key) => {
+          return <Layout rowData={row} key={key} />;
+        })}
       </div>
     </FilterContext.Provider>
   );
