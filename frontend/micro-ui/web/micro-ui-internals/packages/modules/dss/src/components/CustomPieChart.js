@@ -21,27 +21,28 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
     type: "metric",
     tenantId,
     requestDate: { ...value?.requestDate, startDate: value?.range?.startDate?.getTime(), endDate: value?.range?.endDate?.getTime() },
-    filters: isPieClicked ? { ...value?.filters, selectedType: pieSelected } : value?.filters,
-    moduleLevel: value?.moduleLevel
+    filters: isPieClicked ? { ...value?.filters, selectedType: pieSelected } : { ...value?.filters },
+    // schemeTitle: "Scheme 2"
+    moduleLevel: value?.moduleLevel,
   });
 
   const chartData = useMemo(() => {
     if (!response) return null;
     setChartDenomination(response?.responseData?.data?.[0]?.headerSymbol);
     const compareFn = (a, b) => b.value - a.value;
-    return (drillDownId === "deathByCategoryDrilldownAge" || response?.responseData?.visualizationCode === "nssNumberOfDeathsByAge"    )// || drillDownId === "nssDeathByCategoryDrillDownAge") 
-    ? response?.responseData?.data?.[0]?.plots.reduce((acc, plot, index) => {
-      acc = acc.concat(plot);
-      return acc;
-    }, []) 
-    : response?.responseData?.data?.[0]?.plots.sort(compareFn).reduce((acc, plot, index) => {
-      // if (index < 4) acc = acc.concat(plot);
-      //else if (index === 4) acc = acc.concat({ label: null, name: "DSS.OTHERS", value: plot?.value, symbol: "amount" });
-      // else acc[3].value += plot?.value;
-      /* Commnted logic of pie chart which hides more that 4 and show max of 4*/
-      acc = acc.concat(plot);
-      return acc;
-    }, []);
+    return drillDownId === "deathByCategoryDrilldownAge" || response?.responseData?.visualizationCode === "nssNumberOfDeathsByAge" // || drillDownId === "nssDeathByCategoryDrillDownAge")
+      ? response?.responseData?.data?.[0]?.plots.reduce((acc, plot, index) => {
+          acc = acc.concat(plot);
+          return acc;
+        }, [])
+      : response?.responseData?.data?.[0]?.plots.sort(compareFn).reduce((acc, plot, index) => {
+          // if (index < 4) acc = acc.concat(plot);
+          //else if (index === 4) acc = acc.concat({ label: null, name: "DSS.OTHERS", value: plot?.value, symbol: "amount" });
+          // else acc[3].value += plot?.value;
+          /* Commnted logic of pie chart which hides more that 4 and show max of 4*/
+          acc = acc.concat(plot);
+          return acc;
+        }, []);
   }, [response]);
 
   const renderLegend = (value) => (
@@ -152,11 +153,11 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
   }
   return (
     <Fragment>
-      { (id === "deathByCategory" ) && (  //|| id === "nssNumberOfDeathsByCategory") && ( 
-            <span className={"dss-pie-subheader" } style={{position:"sticky" ,left:0}}>
-              {t('DSS_CMN_PIE_INFO')}
-            </span>
-          )}
+      {id === "deathByCategory" && ( //|| id === "nssNumberOfDeathsByCategory") && (
+        <span className={"dss-pie-subheader"} style={{ position: "sticky", left: 0 }}>
+          {t("DSS_CMN_PIE_INFO")}
+        </span>
+      )}
       {isPieClicked && (
         <div>
           <div className="tag-container" style={{ marginBottom: "unset" }}>
@@ -177,13 +178,13 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
             <Pie
               data={chartData}
               dataKey={dataKey}
-              cy={150}
+              cy={200}
               style={{ cursor: response?.responseData?.drillDownChartId !== "none" ? "pointer" : "default" }}
-              innerRadius={checkChartID(id) && !mobileView ? 90 : 70} ///Charts in rows(which contains 2 charts) are little bigger in size than charts in rows(which contains 3 charts) charts
+              innerRadius={checkChartID(id) && !mobileView ? 90 : 50} ///Charts in rows(which contains 2 charts) are little bigger in size than charts in rows(which contains 3 charts) charts
               outerRadius={checkChartID(id) && !mobileView ? 110 : 90}
               margin={{ top: isPieClicked ? 0 : 5 }}
               fill="#8884d8"
-              //label={renderCustomLabel}
+              label={renderCustomLabel}
               labelLine={false}
               isAnimationActive={false}
               onClick={response?.responseData?.drillDownChartId !== "none" ? onPieClick : null}
@@ -210,7 +211,7 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
                       overflowX: "auto",
                       paddingTop: -20,
                     }
-                  : { paddingRight: checkChartID(id) && !mobileView ? 60 : 0, width: "27%", overflowX: "auto", paddingTop: -20 } ///Padding for 2 charts in a row cases
+                  : { paddingRight: checkChartID(id) && !mobileView ? 60 : 0, width: "35%", overflowX: "auto", paddingTop: -20 } ///Padding for 2 charts in a row cases
               }
             />
           </PieChart>
