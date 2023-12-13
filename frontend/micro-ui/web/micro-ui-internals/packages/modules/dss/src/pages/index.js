@@ -29,15 +29,16 @@ const getInitialRange = () => {
   const interval = Digit.Utils.dss.getDuration(startDate, endDate);
   const denomination = data?.denomination || "Lac";
   const tenantId = data?.filters?.tenantId || [];
+  const district = data?.filters?.district || [];
   const moduleLevel = data?.moduleLevel || "";
-  return { startDate, endDate, title, interval, denomination, tenantId, moduleLevel };
+  return { startDate, endDate, title, interval, denomination, tenantId, district, moduleLevel };
 };
 
 const DashBoard = ({ stateCode }) => {
   const tenantId = Digit.ULBService.getCurrentTenantId();
   const { t } = useTranslation();
   const [filters, setFilters] = useState(() => {
-    const { startDate, endDate, title, interval, denomination, tenantId, moduleLevel } = getInitialRange();
+    const { startDate, endDate, title, interval, denomination, district, tenantId, moduleLevel } = getInitialRange();
     return {
       denomination,
       range: { startDate, endDate, title, interval },
@@ -49,6 +50,7 @@ const DashBoard = ({ stateCode }) => {
       },
       filters: {
         tenantId,
+        district
       },
       moduleLevel: moduleLevel,
     };
@@ -109,7 +111,7 @@ const DashBoard = ({ stateCode }) => {
   const [tabState, setTabState] = useState("");
 
   const handleFilters = (data) => {
-    Digit.SessionStorage.set(key, data);
+        Digit.SessionStorage.set(key, data);
     setFilters(data);
   };
   const fullPageRef = useRef();
@@ -132,6 +134,12 @@ const DashBoard = ({ stateCode }) => {
     handleFilters({
       ...filters,
       filters: { ...filters?.filters, tenantId: [...filters?.filters?.tenantId].filter((tenant, index) => index !== id) },
+    });
+  };
+  const removeDist = (id) => {
+    handleFilters({
+      ...filters,
+      filters: { ...filters?.filters, district: [...filters?.filters?.district].filter((dist, index) => index !== id) },
     });
   };
   const removeST = (id) => {
@@ -166,6 +174,10 @@ const DashBoard = ({ stateCode }) => {
   const handleClear = () => {
     handleFilters({ ...filters, filters: { ...filters?.filters, tenantId: [] } });
   };
+
+  const handleClearDistrict = () => {
+    handleFilters({ ...filters, filters: { ...filters?.filters, district: [] } });
+  }
 
   const clearAllTn = () => {
     handleFilters({ ...filters, filters: { ...filters?.filters, ulb: [] } });
@@ -311,7 +323,42 @@ const DashBoard = ({ stateCode }) => {
             closeFilters={() => setIsFilterModalOpen(false)}
             isNational={isNational}
             showDateRange={dashboardConfig?.[0]?.name.includes("DSS_FINANCE_DASHBOARD") ? false : true}
+            showDenomination={false}
+            showUlb={false}
+            showDDR={false}
+            showDistrictFilter={true}
           />
+        )}
+        {filters?.filters?.district?.length > 0 && (
+          <div className="tag-container">
+            {!showFilters &&
+              filters?.filters?.district &&
+              filters.filters.district
+                .slice(0, 4)
+                .map((filter, id) => <RemoveableTag key={id} text={`${t(`DSS_HEADER_DIST`)}: ${t(filter)}`} onClick={() => removeDist(id)} />)
+            }
+            {filters?.filters?.district?.length > 4 && (
+              <>
+                {showFilters &&
+                  filters.filters.district.map((filter, id) => (
+                    <RemoveableTag key={id} text={`${t(`DSS_HEADER_DIST`)}: ${t(filter)}`} onClick={() => removeDist(id)} />
+                  ))}
+                {!showFilters && (
+                  <p className="clearText cursorPointer" onClick={() => setShowFilters(true)}>
+                    {t(`DSS_FILTER_SHOWALL`)}
+                  </p>
+                )}
+                {showFilters && (
+                  <p className="clearText cursorPointer" onClick={() => setShowFilters(false)}>
+                    {t(`DSS_FILTER_SHOWLESS`)}
+                  </p>
+                )}
+              </>
+            )}
+            <p className="clearText cursorPointer" onClick={handleClearDistrict}>
+              {t(`DSS_FILTER_CLEAR`)}
+            </p>
+          </div>
         )}
         {filters?.filters?.tenantId?.length > 0 && (
           <div className="tag-container">

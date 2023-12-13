@@ -110,6 +110,13 @@ const CustomHorizontalBarChart = ({
     return `${tickFormat}`;
   };
 
+  const getBarColors = (index) => {
+    if (id === "farmerRegistrations") {
+      return barColors[1];
+    }
+    return barColors[index];
+  }
+
   const bars = response?.responseData?.data?.map((bar) => bar?.headerName);
   return (
     <Fragment>
@@ -160,7 +167,7 @@ const CustomHorizontalBarChart = ({
             />
             <XAxis dataKey={xDataKey} type={xAxisType} tick={{ fontSize: "14px", fill: "#505A5F" }} tickCount={10} tickFormatter={tickFormatter} />
             {bars?.map((bar, id) => (
-              <Bar key={id} dataKey={t(bar)} fill={barColors[id]} stackId={bars?.length > 2 ? 1 : id} />
+              <Bar key={id} dataKey={t(bar)} fill={getBarColors(id)} stackId={bars?.length > 2 ? 1 : id} label={{ position: 'top' }}/>
             ))}
             <Legend formatter={renderLegend} iconType="circle" />
             <Tooltip cursor={false} formatter={tooltipFormatter} />
