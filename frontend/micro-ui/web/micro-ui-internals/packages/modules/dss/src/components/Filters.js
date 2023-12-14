@@ -4,6 +4,32 @@ import DateRange from "./DateRange";
 import FilterContext from "./FilterContext";
 import Switch from "./Switch";
 
+const districtsData = [
+  {
+      "code": "ADB",
+      "ddrKey": "DDR_PG_ADB"
+  },
+  {
+      "code": "HYD",
+      "ddrKey": "DDR_PG_HYD"
+  },
+  {
+      "code": "Nizamabad",
+      "ddrKey": "DDR_PG_Nizamabad"
+  },
+  {
+      "code": "Khammam",
+      "ddrKey": "DDR_PG_Khammam"
+  },
+  {
+      "code": "MNCL",
+      "ddrKey": "DDR_PG_MNCL"
+  },
+  {
+      "code": "Karimnagar",
+      "ddrKey": "DDR_PG_Karimnagar"
+  }
+];
 
 const Filters = ({
   t,
@@ -17,6 +43,7 @@ const Filters = ({
   showDenomination = true,
   showModuleFilter = true,
   isNational = false,
+  showDistrictFilter = false
 }) => {
   const { value, setValue } = useContext(FilterContext);
 
@@ -27,6 +54,14 @@ const Filters = ({
   useEffect(() => {
     setSelected(ulbTenants?.ulb?.filter((tenant) => value?.filters?.tenantId?.find((selectedTenant) => selectedTenant === tenant?.code)));
   }, [value?.filters?.tenantId]);
+
+  const [selectedDistricts, setSelectedDistricts] = useState(() => 
+    districtsData.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.code))
+  );
+
+  useEffect(() => {
+    setSelectedDistricts(districtsData.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.code)));
+  }, [value?.filters?.district]);
 
   const [selectService, setSelectedService] = useState(() => 
     services?.filter((module) => value?.moduleLevel === module?.code)
@@ -41,7 +76,7 @@ const Filters = ({
   };
 
   const selectFilters = (e, data) => {
-    setValue({ ...value, filters: { tenantId: e.map((allPropsData) => allPropsData?.[1]?.code) } });
+    setValue({ ...value, filters: {...value.filters, tenantId: e.map((allPropsData) => allPropsData?.[1]?.code) } });
   };
 
   const selectServicesFilters = (e, data) => {
@@ -54,7 +89,17 @@ const Filters = ({
         return ulb.ddrKey === tenant?.[1].ddrKey;
       });
     });
-    setValue({ ...value, filters: { tenantId: DDRsSelectedByUser.map((allPropsData) => allPropsData?.code) } });
+    setValue({ ...value, filters: {...value.filters, tenantId: DDRsSelectedByUser.map((allPropsData) => allPropsData?.code) } });
+  };
+
+  const selectDistrict = (e, data) => {
+    const districtSelected = districtsData.filter((ulb) => {
+      return !!e.find((dist) => {
+        return ulb.ddrKey === dist?.[1].ddrKey;
+      });
+    });
+    setSelectedDistricts(districtSelected);
+    setValue({ ...value, filters: {...value.filters, district:  districtSelected.map((allPropsData) => allPropsData?.code)} });
   };
 
   const selectedDDRs = useMemo(
@@ -71,7 +116,7 @@ const Filters = ({
       range: Digit.Utils.dss.getInitialRange(),
     });
   };
-  return (
+    return (
     <div className={`filters-wrapper ${isOpen ? "filters-modal" : ""}`} style={{
       justifyContent: window.location.href.includes("dss/dashboard/finance") && !isOpen ? "space-between" : "unset",
       paddingRight: window.location.href.includes("dss/dashboard/finance") && !isOpen? "24px" : "0px",
@@ -92,6 +137,19 @@ const Filters = ({
       {showDateRange && (
         <div className="filters-input">
           <DateRange onFilterChange={handleFilterChange} values={value?.range} t={t} />
+        </div>
+      )}
+      {showDistrictFilter && !isNational && (
+        <div className="filters-input">
+          <div className="mbsm">{t("ES_DSS_DISTRICT")}</div>
+          <MultiSelectDropdown
+            options={districtsData}
+            optionsKey="ddrKey"
+            onSelect={selectDistrict}
+            selected={selectedDistricts}
+            defaultLabel={t("ES_DSS_ALL_DISTRICT_SELECTED")}
+            defaultUnit={t("ES_DSS_DISTRICT_SELECTED")}
+          />
         </div>
       )}
       {showDDR && (

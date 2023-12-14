@@ -22,7 +22,6 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
     tenantId,
     requestDate: { ...value?.requestDate, startDate: value?.range?.startDate?.getTime(), endDate: value?.range?.endDate?.getTime() },
     filters: isPieClicked ? { ...value?.filters, selectedType: pieSelected } : { ...value?.filters },
-    // schemeTitle: "Scheme 2"
     moduleLevel: value?.moduleLevel,
   });
 
@@ -178,7 +177,7 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
             <Pie
               data={chartData}
               dataKey={dataKey}
-              cy={200}
+              cy={180}
               style={{ cursor: response?.responseData?.drillDownChartId !== "none" ? "pointer" : "default" }}
               innerRadius={checkChartID(id) && !mobileView ? 90 : 50} ///Charts in rows(which contains 2 charts) are little bigger in size than charts in rows(which contains 3 charts) charts
               outerRadius={checkChartID(id) && !mobileView ? 110 : 90}
