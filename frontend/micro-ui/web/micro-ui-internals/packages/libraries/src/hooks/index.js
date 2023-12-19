@@ -19,6 +19,7 @@ import useBoundaryLocalities from "./useLocalities";
 import useCommonMDMS from "./useMDMS";
 import useWorkflowDetailsV2 from "./useWorkflowDetailsV2";
 import useModuleTenants from "./useModuleTenants";
+import useTenantDistricts from "./useTenantDistricts";
 import useQueryParams from "./useQueryParams";
 import useRouteSubscription from "./useRouteSubscription";
 import { useUserSearch } from "./userSearch";
@@ -170,6 +171,7 @@ const Hooks = {
   useCommonMDMS,
   useApplicationStatusGeneral,
   useModuleTenants,
+  useTenantDistricts,
   useRecieptSearch,
   usePaymentSearch,
   useNewInboxGeneral,

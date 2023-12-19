@@ -89,7 +89,7 @@ const initDigitUI = () => {
     commonUiConfig: UICustomizations,
   };
 
-  const stateCode = "pg";
+  const stateCode = "br";
   initTokens(stateCode);
 
   ReactDOM.render(<DigitUI stateCode={stateCode} enabledModules={enabledModules} moduleReducers={moduleReducers} />, document.getElementById("root"));

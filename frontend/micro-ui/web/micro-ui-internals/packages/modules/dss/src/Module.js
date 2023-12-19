@@ -27,7 +27,7 @@ const DssBreadCrumb = ({ location }) => {
           ? "/digit-ui/employee/dss/landing/NURT_DASHBOARD"
           : "/digit-ui/employee/dss/landing/home",
       content: t("ES_LANDING_PAGE"),
-      show: true,
+      show: false,
     },
     {
       path: fromModule

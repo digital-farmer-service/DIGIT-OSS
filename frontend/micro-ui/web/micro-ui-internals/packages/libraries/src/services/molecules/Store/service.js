@@ -54,7 +54,7 @@ export const StoreService = {
     });
     return await Promise.all(allBoundries);
   },
-  digitInitData: async (stateCode, enabledModules) => {
+    digitInitData: async (stateCode, enabledModules) => {
     const { MdmsRes } = await MdmsService.init(stateCode);
     const stateInfo = MdmsRes["common-masters"]?.StateInfo?.[0]||{};
     const uiHomePage = MdmsRes["common-masters"]?.uiHomePage?.[0]||{};
@@ -72,6 +72,7 @@ export const StoreService = {
       },
       localizationModules: stateInfo.localizationModules,
       modules: MdmsRes?.tenant?.citymodule.filter((module) => module?.active).filter((module) => enabledModules?.includes(module?.code))?.sort((x,y)=>x?.order-y?.order),
+      districts:MdmsRes?.tenant?.districts,
       uiHomePage: uiHomePage
     };
 
