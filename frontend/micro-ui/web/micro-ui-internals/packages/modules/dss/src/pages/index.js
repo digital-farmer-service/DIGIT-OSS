@@ -105,6 +105,7 @@ const DashBoard = ({ stateCode }) => {
 
   const { data: response, isLoading } = Digit.Hooks.dss.useDashboardConfig("farmersRegistered");
   const { data: ulbTenants, isLoading: isUlbLoading } = Digit.Hooks.useModuleTenants("DSS");
+  const { data: tenantDistricts, isLoading: isDistLoading } = Digit.Hooks.useTenantDistricts("DSS");
   const { isLoading: isMdmsLoading, data: mdmsData } = Digit.Hooks.useCommonMDMS(stateCode, "FSM", "FSTPPlantInfo");
   const [showOptions, setShowOptions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -123,7 +124,7 @@ const DashBoard = ({ stateCode }) => {
       fstpMdmsData: mdmsData,
       screenConfig: screenConfig,
     }),
-    [filters, isUlbLoading, isMdmsLoading, isServicesLoading]
+    [filters, isUlbLoading, isMdmsLoading, isServicesLoading, isDistLoading]
   );
 
   const mobileView = window.Digit.Utils.browser.isMobile();
@@ -271,7 +272,7 @@ const DashBoard = ({ stateCode }) => {
       },
     ];
 
-  if (isLoading || isUlbLoading || localizationLoading || isMdmsLoading || isLoadingNAT || isServicesLoading) {
+  if (isLoading || isUlbLoading || localizationLoading || isMdmsLoading || isLoadingNAT || isServicesLoading || isDistLoading) {
     return <Loader />;
   }
   return (
@@ -319,6 +320,7 @@ const DashBoard = ({ stateCode }) => {
             showModuleFilter={!isNational && dashboardConfig?.[0]?.name.includes("OVERVIEW") ? true : false}
             services={screenConfig}
             ulbTenants={isNational ? nationalInfo : ulbTenants}
+            tenantDistricts={tenantDistricts}
             isOpen={isFilterModalOpen}
             closeFilters={() => setIsFilterModalOpen(false)}
             isNational={isNational}

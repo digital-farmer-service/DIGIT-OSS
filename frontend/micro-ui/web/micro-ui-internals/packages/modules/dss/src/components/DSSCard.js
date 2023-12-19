@@ -1,4 +1,4 @@
-import { ModuleCardFullWidth } from "@egovernments/digit-ui-react-components";
+import { ModuleCardFullWidth, EmployeeModuleCard} from "@egovernments/digit-ui-react-components";
 import React from "react";
 import { useTranslation } from "react-i18next";
 
@@ -77,7 +77,7 @@ const DSSCard = () => {
     className: "employeeCard card-home customEmployeeCard full-employee-card-height home-action-cards",
     links: [...links],
   };
-  return <ModuleCardFullWidth {...propsForModuleCard} styles={{ width: "100%" }} />;
+  return <EmployeeModuleCard {...propsForModuleCard} styles={{ width: "100%" }} />;
 };
 
 export { DSSCard, NDSSCard };

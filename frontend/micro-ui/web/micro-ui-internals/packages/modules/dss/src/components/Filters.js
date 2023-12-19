@@ -4,36 +4,10 @@ import DateRange from "./DateRange";
 import FilterContext from "./FilterContext";
 import Switch from "./Switch";
 
-const districtsData = [
-  {
-      "code": "ADB",
-      "ddrKey": "DDR_PG_ADB"
-  },
-  {
-      "code": "HYD",
-      "ddrKey": "DDR_PG_HYD"
-  },
-  {
-      "code": "Nizamabad",
-      "ddrKey": "DDR_PG_Nizamabad"
-  },
-  {
-      "code": "Khammam",
-      "ddrKey": "DDR_PG_Khammam"
-  },
-  {
-      "code": "MNCL",
-      "ddrKey": "DDR_PG_MNCL"
-  },
-  {
-      "code": "Karimnagar",
-      "ddrKey": "DDR_PG_Karimnagar"
-  }
-];
-
 const Filters = ({
   t,
   ulbTenants,
+  tenantDistricts,
   services,
   isOpen,
   closeFilters,
@@ -56,11 +30,11 @@ const Filters = ({
   }, [value?.filters?.tenantId]);
 
   const [selectedDistricts, setSelectedDistricts] = useState(() => 
-    districtsData.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.code))
+  tenantDistricts?.ddr?.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.name))
   );
 
   useEffect(() => {
-    setSelectedDistricts(districtsData.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.code)));
+    setSelectedDistricts(tenantDistricts?.ddr?.filter((dist) => value?.filters?.district?.find((selectedDistrict) => selectedDistrict === dist?.name)));
   }, [value?.filters?.district]);
 
   const [selectService, setSelectedService] = useState(() => 
@@ -93,13 +67,13 @@ const Filters = ({
   };
 
   const selectDistrict = (e, data) => {
-    const districtSelected = districtsData.filter((ulb) => {
+    const districtSelected = tenantDistricts?.ddr?.filter((ulb) => {
       return !!e.find((dist) => {
         return ulb.ddrKey === dist?.[1].ddrKey;
       });
     });
     setSelectedDistricts(districtSelected);
-    setValue({ ...value, filters: {...value.filters, district:  districtSelected.map((allPropsData) => allPropsData?.code)} });
+    setValue({ ...value, filters: {...value.filters, district:  districtSelected.map((allPropsData) => allPropsData?.name)} });
   };
 
   const selectedDDRs = useMemo(
@@ -143,7 +117,7 @@ const Filters = ({
         <div className="filters-input">
           <div className="mbsm">{t("ES_DSS_DISTRICT")}</div>
           <MultiSelectDropdown
-            options={districtsData}
+            options={tenantDistricts?.ddr && tenantDistricts.ddr?.sort((x, y) => x?.ddrKey?.localeCompare(y?.ddrKey))}
             optionsKey="ddrKey"
             onSelect={selectDistrict}
             selected={selectedDistricts}
