@@ -105,7 +105,7 @@ const DashBoard = ({ stateCode }) => {
 
   const { data: response, isLoading } = Digit.Hooks.dss.useDashboardConfig("farmersRegistered");
   const { data: ulbTenants, isLoading: isUlbLoading } = Digit.Hooks.useModuleTenants("DSS");
-  const { data: tenantDistricts, isLoading: isDistLoading } = Digit.Hooks.useTenantDistricts("DSS");
+  const { data: tenantDistricts, isLoading: isDistLoading } = Digit.Hooks.useTenantDistricts("DSS", stateCode);
   const { isLoading: isMdmsLoading, data: mdmsData } = Digit.Hooks.useCommonMDMS(stateCode, "FSM", "FSTPPlantInfo");
   const [showOptions, setShowOptions] = useState(false);
   const [showFilters, setShowFilters] = useState(false);

@@ -2,12 +2,12 @@ import React from "react";
 import { useQuery } from "react-query";
 import { useTranslation } from "react-i18next";
 
-const useTenantDistricts = (module, config = {}) => {
+const useTenantDistricts = (module, tenantId, config = {}) => {
   const { t } = useTranslation();
 
-  return useQuery(["TENANT_DISTRICTS", module], () => Digit.SessionStorage.get("initData"), {
+  return useQuery(["TENANT_DISTRICTS", module], () => Digit.LocationService.getLocalities(tenantId), {
     select: (data) => ({
-      ddr: data.districts
+      ddr: data?.boundarys
         ?.map((district) => ({
           ...district,
           ddrKey: t(`${district.name}`),
