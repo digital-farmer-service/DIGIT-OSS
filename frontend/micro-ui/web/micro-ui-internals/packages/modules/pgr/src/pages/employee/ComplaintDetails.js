@@ -152,7 +152,7 @@ const ComplaintDetailsModal = ({ workflowDetails, complaintDetails, close, popup
               ? t("CS_ACTION_REJECT")
               : selectedAction === "REOPEN"
               ? t("CS_COMMON_REOPEN")
-              : t("CS_COMMON_RESOLVE")
+              : t("CS_COMMON_CLOSE")
           }
         />
       }
@@ -166,7 +166,7 @@ const ComplaintDetailsModal = ({ workflowDetails, complaintDetails, close, popup
           ? t("CS_COMMON_REJECT")
           : selectedAction === "REOPEN"
           ? t("CS_COMMON_REOPEN")
-          : t("CS_COMMON_RESOLVE")
+          : t("CS_COMMON_CLOSE")
       }
       actionSaveOnSubmit={() => {
         if (selectedAction === "REJECT" && !comments) setError(t("CS_MANDATORY_COMMENTS"));
@@ -176,7 +176,7 @@ const ComplaintDetailsModal = ({ workflowDetails, complaintDetails, close, popup
       setError={setError}
     >
       <Card>
-        {selectedAction === "REJECT" || selectedAction === "RESOLVE" || selectedAction === "REOPEN" ? null : (
+        {selectedAction === "REJECT" || selectedAction === "CLOSE" || selectedAction === "REOPEN" ? null : (
           <React.Fragment>
             <CardLabel>{t("CS_COMMON_EMPLOYEE_NAME")}</CardLabel>
             {employeeData && <SectionalDropdown selected={selectedEmployee} menuData={employeeData} displayKey="name" select={onSelectEmployee} />}
@@ -307,7 +307,7 @@ export const ComplaintDetails = (props) => {
         setPopup(true);
         setDisplayMenu(false);
         break;
-      case "RESOLVE":
+      case "CLOSE":
         setPopup(true);
         setDisplayMenu(false);
         break;
@@ -423,6 +423,43 @@ export const ComplaintDetails = (props) => {
     );
   };
 
+  const CustomRow = (props) => {
+    let value = props.text;
+    if (Array.isArray(props.text)) {
+      value = props.text.map((val, index) => {
+        if (val?.className) {
+          return (
+            <p className={val?.className} style={val?.style} key={index}>
+              {val?.value}
+            </p>
+          );
+        }
+        return (
+          <p key={index}>
+            {val}
+          </p>
+        );
+      });
+    }
+    return (
+      <div className={`${props.last ? "row last" : "row"}`}>
+        <h2>{props.label}</h2>
+        <div className="value">
+          <p>{value}</p> 
+        </div>
+      </div>
+    );
+  };
+
+  const CustomStatusTable = (props) => {
+    const employee = Digit.SessionStorage.get("user_type") === "employee" ? true : false;
+      return (
+        <div className={employee ? "employee-data-table" : "data-table"}>
+          {props.children}
+        </div>
+      );
+  };
+
   return (
     <React.Fragment>
       <Card>
@@ -431,10 +468,10 @@ export const ComplaintDetails = (props) => {
         {isLoading ? (
           <Loader />
         ) : (
-          <StatusTable>
+          <CustomStatusTable>
             {complaintDetails &&
               Object.keys(complaintDetails?.details).map((k, i, arr) => (
-                <Row
+                <CustomRow
                   key={k}
                   label={t(k)}
                   text={
@@ -451,7 +488,7 @@ export const ComplaintDetails = (props) => {
                 <MapView onClick={zoomView} />
               </MediaRow>
             )}
-          </StatusTable>
+          </CustomStatusTable>
         )}
         {imagesToShowBelowComplaintDetails?.thumbs ? (
           <DisplayPhotos srcs={imagesToShowBelowComplaintDetails?.thumbs} onClick={(source, index) => zoomImageWrapper(source, index)} />

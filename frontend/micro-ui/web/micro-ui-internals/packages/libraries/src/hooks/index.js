@@ -40,6 +40,7 @@ import useComplaintTable from "./pgr/useComplaintTable";
 import useComplaintTypes from "./pgr/useComplaintTypes";
 import useEmployeeFilter from "./pgr/useEmployeeFilter";
 import useInboxData from "./pgr/useInboxData";
+import useComplaintsCount from "./pgr/useComplaintsCount";
 import useLocalities from "./pgr/useLocalities";
 import useServiceDefs from "./pgr/useServiceDefs";
 import usePGRTenants from "./pgr/useTenants";
@@ -103,6 +104,7 @@ const pgr = {
   useTenants: usePGRTenants,
   useComplaintSubType,
   useComplaintStatusCount,
+  useComplaintsCount
 };
 
 
@@ -151,6 +153,10 @@ const survey = {
   useSurveyInbox,
 };
 
+const fsm = {
+  useRouteSubscription
+}
+
 const Hooks = {
   useSessionStorage,
   useQueryParams,
@@ -188,6 +194,7 @@ const Hooks = {
   dss,
   
   hrms,
+  fsm,
  
   events,
   engagement,

@@ -20,6 +20,7 @@ const DesktopInbox = ({
   pageSizeLimit,
   onPageSizeChange,
   totalRecords,
+  isSystemUser
 }) => {
   const { t } = useTranslation();
   const GetCell = (value) => <span className="cell-text">{value}</span>;
@@ -42,6 +43,12 @@ const DesktopInbox = ({
               <span className="complain-no-cell-text">{t(`SERVICEDEFS.${row.original["complaintSubType"].toUpperCase()}`)}</span>
             </div>
           );
+        },
+      },
+      {
+        Header: t("WF_INBOX_HEADER_DISTRICT"),
+        Cell: ({ row }) => {
+          return GetCell(row.original["district"]);
         },
       },
       {
@@ -87,7 +94,7 @@ const DesktopInbox = ({
           ))}
       </Card>
     );
-  } else if (data.length > 0) {
+  } else if (data && data.length > 0) {
     result = (
       <ComplaintTable
         t={t}
@@ -129,7 +136,7 @@ const DesktopInbox = ({
       <div className="filters-container">
         <ComplaintsLink />
         <div>
-          <Filter complaints={data} onFilterChange={onFilterChange} type="desktop" searchParams={searchParams} />
+          <Filter complaints={data} onFilterChange={onFilterChange} type="desktop" searchParams={searchParams} isSystemUser={isSystemUser} />
         </div>
       </div>
       <div style={{ flex: 1 }}>

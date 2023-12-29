@@ -8,34 +8,46 @@ import { useTranslation } from "react-i18next";
 import { Employee } from "../../constants/Routes";
 // import Response from "./Response";
 
+const DssBreadCrumb = ( {location} ) => {
+  const match = useRouteMatch();
+  const { t } = useTranslation();
+  const crumbs = [
+    {
+      content: t("CS_COMMON_HOME"),
+      path: Employee.Home,
+      show: true,
+    },
+    {
+      content: t("CS_COMMON_INBOX"),
+      path: match.url + Employee.Inbox,
+      show: location.includes(Employee.Inbox) || location.includes(Employee.ComplaintDetails) ? true : false,
+    },
+    {
+      content: t("CS_PGR_CREATE_COMPLAINT"),
+      path: match.url + Employee.CreateComplaint,
+      show: location.includes(Employee.CreateComplaint) ? true : false,
+    },
+    {
+      content: t("CS_PGR_COMPLAINT_DETAILS"),
+      path: match.url + Employee.ComplaintDetails + ":id",
+      show: location.includes(Employee.ComplaintDetails) ? true : false,
+    },
+    {
+      content: t("CS_PGR_RESPONSE"),
+      path: match.url + Employee.Response,
+      show: location.includes(Employee.Response) ? true : false,
+    },
+  ];
+
+  return <BreadCrumb crumbs={crumbs?.filter((ele) => ele.show)} />;
+};
+
 const Complaint = () => {
   const [displayMenu, setDisplayMenu] = useState(false);
   const [popup, setPopup] = useState(false);
   const match = useRouteMatch();
   const { t } = useTranslation();
 
-  const breadcrumConfig = {
-    home: {
-      content: t("CS_COMMON_HOME"),
-      path: Employee.Home,
-    },
-    inbox: {
-      content: t("CS_COMMON_INBOX"),
-      path: match.url + Employee.Inbox,
-    },
-    createComplaint: {
-      content: t("CS_PGR_CREATE_COMPLAINT"),
-      path: match.url + Employee.CreateComplaint,
-    },
-    complaintDetails: {
-      content: t("CS_PGR_COMPLAINT_DETAILS"),
-      path: match.url + Employee.ComplaintDetails + ":id",
-    },
-    response: {
-      content: t("CS_PGR_RESPONSE"),
-      path: match.url + Employee.Response,
-    },
-  };
   function popupCall(option) {
     setDisplayMenu(false);
     setPopup(true);
@@ -52,24 +64,7 @@ const Complaint = () => {
     <React.Fragment>
       <div className="ground-container">
         {!location.includes(Employee.Response) && (
-          <Switch>
-            <Route
-              path={match.url + Employee.CreateComplaint}
-              component={() => <BreadCrumb crumbs={[breadcrumConfig.home, breadcrumConfig.createComplaint]}></BreadCrumb>}
-            />
-            <Route
-              path={match.url + Employee.ComplaintDetails + ":id"}
-              component={() => <BreadCrumb crumbs={[breadcrumConfig.home, breadcrumConfig.inbox, breadcrumConfig.complaintDetails]}></BreadCrumb>}
-            />
-            <Route
-              path={match.url + Employee.Inbox}
-              component={() => <BreadCrumb crumbs={[breadcrumConfig.home, breadcrumConfig.inbox]}></BreadCrumb>}
-            />
-            <Route
-              path={match.url + Employee.Response}
-              component={<BreadCrumb crumbs={[breadcrumConfig.home, breadcrumConfig.response]}></BreadCrumb>}
-            />
-          </Switch>
+          <DssBreadCrumb location={location} />
         )}
         <Switch>
           <Route path={match.url + Employee.CreateComplaint} component={() => <CreateComplaint parentUrl={match.url} />} />

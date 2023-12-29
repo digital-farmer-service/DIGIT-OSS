@@ -3,7 +3,7 @@ import { Redirect, Route, Switch, useHistory, useLocation } from "react-router-d
 import CitizenApp from "./pages/citizen";
 import EmployeeApp from "./pages/employee";
 
-export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData ,defaultLanding="citizen"}) => {
+export const DigitApp = ({ stateCode, modules, appTenants, logoUrl, initData ,defaultLanding="employee"}) => {
   const history = useHistory();
   const { pathname } = useLocation();
   const innerWidth = window.innerWidth;

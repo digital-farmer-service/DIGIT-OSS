@@ -2,14 +2,14 @@ import Urls from "../atoms/urls";
 import { Request } from "../atoms/Utils/Request";
 
 export const PGRService = {
-  search: (tenantId, filters = {}) => {
+  search: (tenantId, filters = {}, serviceRequestIds = '') => {
     return Request({
       url: Urls.pgr_search,
       useCache: false,
       method: "POST",
       auth: true,
       userService: true,
-      params: { tenantId: tenantId, ...filters },
+      params: { tenantId: tenantId,serviceRequestIds: serviceRequestIds, ...filters },
     });
   },
   create: (details, tenantId) =>

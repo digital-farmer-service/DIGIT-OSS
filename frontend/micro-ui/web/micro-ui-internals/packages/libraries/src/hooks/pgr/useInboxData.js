@@ -16,17 +16,29 @@ const useInboxData = (searchParams) => {
     let wfFilters = { ...commonFilters, ...searchParams.filters.wfQuery };
     let complaintDetailsResponse = null;
     let combinedRes = [];
-    complaintDetailsResponse = await Digit.PGRService.search(tenantId, appFilters);
-    complaintDetailsResponse.ServiceWrappers.forEach((service) => serviceIds.push(service.service.serviceRequestId));
-    const serviceIdParams = serviceIds.join();
-    const workflowInstances = await Digit.WorkflowService.getByBusinessId(tenantId, serviceIdParams, wfFilters, false);
+    let workflowInstances = null;
+
+    if(searchParams.filters.wfQuery.assignee) {
+      let serviceIdParams = '';
+      workflowInstances = await Digit.WorkflowService.getByBusinessId(tenantId, serviceIds, wfFilters, false);
+      if (workflowInstances.ProcessInstances.length) {
+        workflowInstances.ProcessInstances.forEach((instance) => serviceIds.push(instance.businessId));
+        serviceIdParams = serviceIds.join();
+      }
+      complaintDetailsResponse = await Digit.PGRService.search(tenantId , appFilters, serviceIdParams);
+    } else {
+      complaintDetailsResponse = await Digit.PGRService.search(tenantId, appFilters);
+      complaintDetailsResponse.ServiceWrappers.forEach((service) => serviceIds.push(service.service.serviceRequestId));
+      const serviceIdParams = serviceIds.join();
+      workflowInstances = await Digit.WorkflowService.getByBusinessId(tenantId, serviceIdParams, wfFilters, false);  
+    }
     if (workflowInstances.ProcessInstances.length) {
       combinedRes = combineResponses(complaintDetailsResponse, workflowInstances).map((data) => ({
         ...data,
         sla: Math.round(data.sla / (24 * 60 * 60 * 1000)),
       }));
     }
-    return combinedRes;
+    return {complaints:combinedRes, totalCount: workflowInstances?.totalCount};
   };
 
   const result = useQuery(["fetchInboxData", 
@@ -50,11 +62,13 @@ const combineResponses = (complaintDetailsResponse, workflowInstances) => {
   return complaintDetailsResponse.ServiceWrappers.map((complaint) => ({
     serviceRequestId: complaint.service.serviceRequestId,
     complaintSubType: complaint.service.serviceCode,
+    complaintSubSubCategory: complaint.service?.additionalDetail?.subSubcategory,
     locality: complaint.service.address.locality.code,
     status: complaint.service.applicationStatus,
     taskOwner: wfMap[complaint.service.serviceRequestId]?.assignes?.[0]?.name || "-",
     sla: wfMap[complaint.service.serviceRequestId]?.businesssServiceSla,
     tenantId: complaint.service.tenantId,
+    district: complaint.service?.address?.district
   }));
 };
 

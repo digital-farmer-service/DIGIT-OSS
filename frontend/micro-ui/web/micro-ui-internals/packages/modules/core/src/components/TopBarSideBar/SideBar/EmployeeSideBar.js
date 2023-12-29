@@ -134,7 +134,7 @@ const EmployeeSideBar = () => {
 
   return (
     <div className="sidebar" ref={sidebarRef} onMouseOver={expandNav} onMouseLeave={collapseNav}>
-      {renderSearch()}
+      {/* {renderSearch()} */}
       {splitKeyValue()}
     </div>
   );
