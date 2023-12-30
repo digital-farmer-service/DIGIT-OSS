@@ -66,11 +66,11 @@ export const LocalizationService = {
       locale += "_IN";
     }
     const [newModules, messages] = LocalizationStore.get(locale, modules);
-    if (newModules.length > 0) {
-      const data = await Request({ url: Urls.localization, params: { module: newModules.join(","), locale, tenantId }, useCache: false });
+    // if (newModules.length > 0) {
+      const data = await Request({ url: Urls.localization, params: { locale, tenantId }, useCache: false });
       messages.push(...data.messages);
       setTimeout(() => LocalizationStore.store(locale, newModules, data.messages), 100);
-    }
+    // }
     LocalizationStore.updateResources(locale, messages);
     return messages;
   },

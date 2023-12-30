@@ -5,7 +5,7 @@ import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recha
 import FilterContext from "./FilterContext";
 import NoData from "./NoData";
 // ["#048BD0", "#FBC02D", "#8E29BF","#EA8A3B","#0BABDE","#6E8459"]
-const COLORS = ["#048BD0", "#FBC02D", "#8E29BF", "#EA8A3B", "#0BABDE", "#6E8459", "#D4351C", "#0CF7E4", "#F80BF4", "#22F80B"];
+const COLORS = ["#F8D040", "#48B16A", "#8E29BF", "#EA8A3B", "#0BABDE", "#6E8459", "#D4351C", "#0CF7E4", "#F80BF4", "#22F80B"];
 const mobileView = innerWidth <= 640;
 
 const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
@@ -45,7 +45,12 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
   }, [response]);
 
   const renderLegend = (value) => (
-    <span style={{ fontSize: "14px", color: "#505A5F" }}>{t(`COMMON_MASTERS_${value && Digit.Utils.locale.getTransformedLocale(value)}`)}</span>
+    <>
+    <span style={{ fontSize: "14px", color: "#505A5F", marginLeft: '7px'}}>
+      {t(`COMMON_MASTERS${id ==="noOfFarmersLinkedWithDBT" ? "_DBT" : ''}_${value && Digit.Utils.locale.getTransformedLocale(value)}`)}
+    </span>
+    <span> - {chartData.find(item => item.name === value).value}</span>
+    </>
   );
 
   const renderCustomLabel = (args) => {
@@ -91,6 +96,19 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
     );
   };
 
+  const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.25;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
   const renderTooltip = ({ payload, label }) => {
     return (
       <div
@@ -103,9 +121,9 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
         }}
       >
         <p className="recharts-tooltip-label">{`${t(
-          `COMMON_MASTERS_${payload?.[0]?.name && Digit.Utils.locale.getTransformedLocale(payload?.[0]?.name)}`
+          `COMMON_MASTERS${id ==="noOfFarmersLinkedWithDBT" ? "_DBT" : ''}_${payload?.[0]?.name && Digit.Utils.locale.getTransformedLocale(payload?.[0]?.name)}`
         )}: ${Digit.Utils.dss.formatter(payload?.[0]?.value, payload?.[0]?.payload?.payload?.symbol, value?.denomination, true, t)}`}</p>
-        <p>{`(${Number((payload?.[0]?.value / response?.responseData?.data?.[0]?.headerValue) * 100).toFixed(1)}%)`}</p>
+        <p>{`(${Number((payload?.[0]?.value / response?.responseData?.data?.[0]?.headerValue) * 100).toFixed(0)}%)`}</p>
       </div>
     );
   };
@@ -141,6 +159,17 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
     setIsPieClicked(false);
   };
 
+  const getCount = () => {
+    if(chartData) {
+      const count = chartData.reduce((acc, item) => {
+        const countValue = item.value !== "" ? Number(item.value) : 0;
+        return acc + countValue;
+      }, 0);
+      return count;
+    }
+    return 0;
+  }
+
   useEffect(() => {
     setIsPieClicked(false);
     setdrillDownId(null);
@@ -150,6 +179,7 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
   if (isLoading) {
     return <Loader />;
   }
+
   return (
     <Fragment>
       {id === "deathByCategory" && ( //|| id === "nssNumberOfDeathsByCategory") && (
@@ -172,6 +202,18 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
       {chartData?.length === 0 || !chartData ? (
         <NoData t={t} />
       ) : (
+        <>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            fontWeight: '600',
+            fontSize: '16px',
+            marginTop: '10px'
+          }}
+        >
+          Total {id ==="noOfFarmersLinkedWithDBT" ? "Farmers" : 'Schemes'} : {getCount()}
+        </div>
         <ResponsiveContainer width="99%" height={340}>
           <PieChart cy={100}>
             <Pie
@@ -179,11 +221,11 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
               dataKey={dataKey}
               cy={180}
               style={{ cursor: response?.responseData?.drillDownChartId !== "none" ? "pointer" : "default" }}
-              innerRadius={checkChartID(id) && !mobileView ? 90 : 50} ///Charts in rows(which contains 2 charts) are little bigger in size than charts in rows(which contains 3 charts) charts
-              outerRadius={checkChartID(id) && !mobileView ? 110 : 90}
+              innerRadius={checkChartID(id) && !mobileView ? 90 : 47} ///Charts in rows(which contains 2 charts) are little bigger in size than charts in rows(which contains 3 charts) charts
+              outerRadius={checkChartID(id) && !mobileView ? 110 : 100}
               margin={{ top: isPieClicked ? 0 : 5 }}
               fill="#8884d8"
-              label={renderCustomLabel}
+              label={renderCustomizedLabel}
               labelLine={false}
               isAnimationActive={false}
               onClick={response?.responseData?.drillDownChartId !== "none" ? onPieClick : null}
@@ -197,9 +239,9 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
               layout="vertical"
               verticalAlign="middle"
               align="right"
-              iconType="circle"
+              iconType="square"
               formatter={renderLegend}
-              iconSize={10}
+              iconSize={15}
               wrapperStyle={
                 chartData?.length > 6
                   ? {
@@ -215,6 +257,7 @@ const CustomPieChart = ({ dataKey = "value", data, setChartDenomination }) => {
             />
           </PieChart>
         </ResponsiveContainer>
+        </>
       )}
       {isPieClicked && (
         <div

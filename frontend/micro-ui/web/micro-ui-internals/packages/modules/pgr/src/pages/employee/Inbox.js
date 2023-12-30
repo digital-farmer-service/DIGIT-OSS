@@ -8,11 +8,12 @@ import MobileInbox from "../../components/MobileInbox";
 const Inbox = () => {
   const { t } = useTranslation();
   const tenantId = Digit.ULBService.getCurrentTenantId();
-  const { uuid } = Digit.UserService.getUser().info;
+  const { uuid , roles} = Digit.UserService.getUser().info;
   const [pageOffset, setPageOffset] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [searchParams, setSearchParams] = useState({ filters: { wfFilters: { assignee: [{ code: uuid }] } }, search: "", sort: {} });
+  const [isSystemUser, setIsSystemUser] = useState(false);
+  const [searchParams, setSearchParams] = useState({ filters: { wfFilters: { assignee: [{ code: uuid }] }, wfQuery:{ assignee: uuid }}, search: "", sort: {} });
 
   useEffect(() => {
     (async () => {
@@ -23,6 +24,16 @@ const Inbox = () => {
       }
     })();
   }, [searchParams]);
+
+  useEffect(() => {
+    const getFiltersAccess = () => {
+      const userRoles = roles?.map((roleData) => roleData?.code);
+      const pgrRoles = ["SYSTEM_SUPPORT_USER"];
+      const FILTERS_ACCESS = userRoles?.filter((role) => pgrRoles.includes(role));
+      return FILTERS_ACCESS?.length > 0;
+    };
+    setIsSystemUser(getFiltersAccess());
+  }, []);
 
   const fetchNextPage = () => {
     setPageOffset((prevState) => prevState + 10);
@@ -43,9 +54,14 @@ const Inbox = () => {
   const onSearch = (params = "") => {
     setSearchParams({ ...searchParams, search: params });
   };
+  let complaints = [];
+  let totalCount = 0;
 
   // let complaints = Digit.Hooks.pgr.useInboxData(searchParams) || [];
-  let { data: complaints, isLoading } = Digit.Hooks.pgr.useInboxData({ ...searchParams, offset: pageOffset, limit: pageSize });
+  let { data: complaintsObj , isLoading } = Digit.Hooks.pgr.useInboxData({ ...searchParams, offset: pageOffset, limit: pageSize });
+  
+  complaints = complaintsObj?.complaints;
+  totalCount = complaintsObj?.totalCount;
 
   let isMobile = Digit.Utils.browser.isMobile();
 
@@ -68,8 +84,9 @@ const Inbox = () => {
             onPrevPage={fetchPrevPage}
             onPageSizeChange={handlePageSizeChange}
             currentPage={Math.floor(pageOffset / pageSize)}
-            totalRecords={totalRecords}
+            totalRecords={isSystemUser ? totalRecords : totalCount}
             pageSizeLimit={pageSize}
+            isSystemUser={isSystemUser}
           />
         </div>
       );

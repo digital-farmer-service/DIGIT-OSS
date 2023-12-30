@@ -59,17 +59,17 @@ const Login = ({ config: propsConfig, t, isDisabled }) => {
   }, [user]);
 
   const onLogin = async (data) => {
-    if (!data.city) {
-      alert("Please Select City!");
-      return;
-    }
+    // if (!data.city) {
+    //   alert("Please Select City!");
+    //   return;
+    // }
     setDisable(true);
 
     const requestData = {
       ...data,
       userType: "EMPLOYEE",
     };
-    requestData.tenantId = data.city.code;
+    requestData.tenantId = "br";
     delete requestData.city;
     try {
       const { UserRequest: info, ...tokens } = await Digit.UserService.authenticate(requestData);
@@ -110,27 +110,28 @@ const Login = ({ config: propsConfig, t, isDisabled }) => {
           },
           isMandatory: true,
         },
-        {
-          label: t(city.label),
-          type: city.type,
-          populators: {
-            name: city.name,
-            customProps: {},
-            component: (props, customProps) => (
-              <Dropdown
-                option={cities}
-                className="login-city-dd"
-                optionKey="i18nKey"
-                select={(d) => {
-                  props.onChange(d);
-                }}
-                t={t}
-                {...customProps}
-              />
-            ),
-          },
-          isMandatory: true,
-        },
+        // {
+        //   label: t(city.label),
+        //   type: city.type,
+        //   populators: {
+        //     name: city.name,
+        //     defaultValue: cities ? cities[0] : '',
+        //     customProps: {},
+        //     component: (props, customProps) => (
+        //       <Dropdown
+        //         option={cities}
+        //         className="login-city-dd"
+        //         optionKey="i18nKey"
+        //         select={(d) => {
+        //           props.onChange(d);
+        //         }}
+        //         t={t}
+        //         {...customProps}
+        //       />
+        //     ),
+        //   },
+        //   isMandatory: true,
+        // },
       ],
     },
   ];

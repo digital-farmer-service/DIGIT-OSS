@@ -1,21 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { EmployeeModuleCard } from "@egovernments/digit-ui-react-components";
+import { EmployeeModuleCard, Loader } from "@egovernments/digit-ui-react-components";
 
 const PGRCard = () => {
   const { t } = useTranslation();
 
+  if (!Digit.Utils.pgrAccess()) {
+    return null;
+  }
+  let totalCount = 0;
+  let loading = true;
+
+  const userInfo = Digit.UserService.getUser();
+  const userRoles = userInfo?.info?.roles?.map((roleData) => roleData?.code);
+  const pgrRoles = ["SYSTEM_SUPPORT_USER"];
+  const systemUser = userRoles?.filter((role) => pgrRoles.includes(role));
+  const isSystemUser =  systemUser?.length > 0;
+
+  if (isSystemUser) {
+    const complaints = Digit.Hooks.pgr.useComplaintStatusCount();
+    loading = false;
+    totalCount = complaints.reduce((acc, item) => {
+      const countValue = item.count !== "" ? Number(item.count) : 0;
+      return acc + countValue;
+    }, 0);
+  } else {
+    const commonFilters = { assignee: userInfo?.info?.uuid };
+    let { data , isLoading } = Digit.Hooks.pgr.useComplaintsCount(commonFilters);
+    loading = isLoading;
+    totalCount = data;
+  }
+  
   const allLinks = [
     { text: t("ES_PGR_INBOX"), link: "/digit-ui/employee/pgr/inbox" },
     { text: t("ES_PGR_NEW_COMPLAINT"), link: "/digit-ui/employee/pgr/complaint/create", accessTo: ["CSR"] },
   ];
-
-  console.debug(Digit.Utils.pgrAccess());
-
-  if (!Digit.Utils.pgrAccess()) {
-    return null;
-  }
 
   const Icon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -39,6 +59,7 @@ const PGRCard = () => {
     moduleName: t("ES_PGR_HEADER_COMPLAINT"),
     kpis: [
       {
+        count: totalCount,
         label: t("TOTAL_PGR"),
         link: `/digit-ui/employee/pgr/inbox`,
       },
@@ -56,6 +77,10 @@ const PGRCard = () => {
     ],
   };
 
-  return <EmployeeModuleCard {...propsForModuleCard} />;
+  if (loading) {
+    return <Loader />;
+  } else {
+    return <EmployeeModuleCard {...propsForModuleCard} />;
+  }
 };
 export default PGRCard;

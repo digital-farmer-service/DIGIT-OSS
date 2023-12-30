@@ -9,7 +9,7 @@ let wfQuery = {};
 
 const Filter = (props) => {
   let { uuid } = Digit.UserService.getUser().info;
-  const { searchParams } = props;
+  const { searchParams, isSystemUser } = props;
   const { t } = useTranslation();
   const isAssignedToMe = searchParams?.filters?.wfFilters?.assignee && searchParams?.filters?.wfFilters?.assignee[0]?.code ? true : false;
 
@@ -192,7 +192,7 @@ const Filter = (props) => {
             )}
           </div>
           <div>
-            <RadioButtons onSelect={onRadioChange} selectedOption={selectAssigned} optionsKey="name" options={assignedToOptions} />
+            {isSystemUser && <RadioButtons onSelect={onRadioChange} selectedOption={selectAssigned} optionsKey="name" options={assignedToOptions} />}
             <div>
               {GetSelectOptions(
                 t("CS_COMPLAINT_DETAILS_COMPLAINT_SUBTYPE"),
@@ -204,8 +204,8 @@ const Filter = (props) => {
                 "serviceCode"
               )}
             </div>
-            <div>{GetSelectOptions(t("CS_PGR_LOCALITY"), localities, selectedLocality, onSelectLocality, "i18nkey", onRemove, "locality")}</div>
-            {<Status complaints={props.complaints} onAssignmentChange={handleAssignmentChange} pgrfilters={pgrfilters} />}
+            {isSystemUser && <div>{GetSelectOptions(t("CS_PGR_LOCALITY"), localities, selectedLocality, onSelectLocality, "i18nkey", onRemove, "locality")}</div>}
+            {isSystemUser && <Status complaints={props.complaints} onAssignmentChange={handleAssignmentChange} pgrfilters={pgrfilters} />}
           </div>
         </div>
       </div>
